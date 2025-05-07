@@ -4,13 +4,23 @@ const connectionConfig = {
     host: 'localhost',
     user: 'root',
     password: 'root',
+    multipleStatements: true,
+  };
+
+const connectionConfigCepex = {
+    host: 'localhost',
+    user: 'root',
+    password: 'root',
     database: 'cepex',
     multipleStatements: true,
   };
 
-const schemaCepex = `
-	
+const queryStart = `
+  	DROP DATABASE IF EXISTS cepex;
+	CREATE DATABASE cepex;
+`
 
+const schemaCepex = `
     CREATE TABLE teacher (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(60),
@@ -125,9 +135,13 @@ const schemaCepex = `
 	`;
 
 exports.initDatabase = async function initDatabase() {
-    const connection = await mysql.createConnection(connectionConfig);
+	const initConnection = await mysql.createConnection(connectionConfig);
+	initConnection.query(queryStart);
+	initConnection.end();
+
+    const connection = await mysql.createConnection(connectionConfigCepex);
     
-    // connection.query(schemaCepex);
+    connection.query(schemaCepex);
 
     return connection;
 }
